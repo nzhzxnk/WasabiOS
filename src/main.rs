@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(offset_of)]
 
+use core::arch::asm;
 use core::mem::offset_of;
 use core::mem::size_of;
 use core::panic::PanicInfo;
@@ -97,6 +98,10 @@ fn locate_graphic_protocol<'a>(
     Ok(unsafe { &*graphic_output_protocol })
 }
 
+pub fn hlt() {
+    unsafe { asm!("hlt") }
+}
+
 #[no_mangle]
 fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
     let efi_graphics_output_protocol =
@@ -113,10 +118,14 @@ fn efi_main(_image_handle: EfiHandle, efi_system_table: &EfiSystemTable) {
         *e = 0xffffff;
     }
     //println!("Hello, world!");
-    loop {}
+    loop {
+        hlt()
+    }
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+    loop {
+        hlt()
+    }
 }
