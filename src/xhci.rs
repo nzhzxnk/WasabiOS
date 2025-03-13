@@ -141,6 +141,13 @@ impl PciXhciDriver {
                 }
             })
         }
+        for port in xhc.regs.portsc.port_range() {
+            if let Some(e) = xhc.regs.portsc.get(port) {
+                if e.csc() {
+                    e.clear_csc();
+                }
+            }
+        }
         loop {
             let mut new_port_connected = None;
             for port in xhc.regs.portsc.port_range() {
